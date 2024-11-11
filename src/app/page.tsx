@@ -1,40 +1,37 @@
-"use client"
+import fs from 'fs';
+import path from 'path';
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} 
+from "@/components/ui/card"
 
-import { useState } from 'react';
-import AudioCard from '../components/AudioCard';
-import { Button } from '@/components/ui/button';
-import {Input} from '@/components/ui/input'
+export default async function Page() {
+  const filePath = path.join(process.cwd(), 'public', 'results.json');
+  const jsonData = fs.readFileSync(filePath, 'utf8');
+  const data = JSON.parse(jsonData);
 
-const Home = () => {
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [transcript, setTranscript] = useState<string>("Sample transcript");
-  const [prediction, setPrediction] = useState<string>("");
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setAudioUrl(url);
-
-      // Simulate ASR request
-      fetch('/api/predict', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ audioData: file }),
-      })
-        .then((res) => res.json())
-        .then((data) => setPrediction(data.prediction));
-    }
-  };
+  const oneAudio = data[0]
 
   return (
-    <div className="flex flex-col items-center p-4">
-      <h1 className="text-3xl font-bold mb-4">Audio Transcription Analysis</h1>
-      <Input type="file" accept="audio/*" onChange={handleFileChange} />
-      <div className="mt-5"></div>
-      {audioUrl && <AudioCard audioUrl={audioUrl} transcript={transcript} prediction={prediction} />}
+    <div>
+      <h1>Audio Player</h1>
+      <pre>{JSON.stringify(oneAudio, null, 2)}</pre>
+      <Card className="w-40">
+      <CardHeader>
+        <CardTitle>Audio</CardTitle>
+      </CardHeader>
+      <CardContent>
+      </CardContent>
+      <CardFooter className="">
+        <Button className="">Open</Button>
+      </CardFooter>
+    </Card>
     </div>
   );
-};
+}
 
-export default Home;
