@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "pnpm install"
+    "postinstall": "yarn install"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.3",
