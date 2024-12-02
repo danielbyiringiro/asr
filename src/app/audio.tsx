@@ -19,33 +19,33 @@ import {
 // Define props type
 interface AudioPlayerProps {
   audioItems: {
-    index: number;
+    id: number;
     mp3_file: string;
-    duration: number;
+    duration: string;
     text: string;
-    validated: boolean;
+    validated: boolean | null;
   }[];
   validatedCount: number;
   nonValidatedCount: number;
 }
 
 export default function AudioPlayer({ audioItems, validatedCount, nonValidatedCount }: AudioPlayerProps) {
-  const [selectedAudioIndex, setSelectedAudioIndex] = useState<number | null>(null);
+  const [selectedAudioId, setSelectedAudioId] = useState<number | null>(null);
   const [transcriptText, setTranscriptText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
 
   // Function to open dialog with selected index
   const openDialog = (index: number) => {
-    setSelectedAudioIndex(index);
+    setSelectedAudioId(index);
   };
 
   // Function to close the dialog
   const closeDialog = () => {
-    setSelectedAudioIndex(null);
+    setSelectedAudioId(null);
   };
 
-  const change_entry = async (index: number, transcript: string) =>
+  const change_entry = async (id: number, transcript: string) =>
     {
       
       try
@@ -56,10 +56,12 @@ export default function AudioPlayer({ audioItems, validatedCount, nonValidatedCo
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            index: selectedAudioIndex,
-            transcript: transcriptText
+            id: id,
+            transcript: transcript
           })
         })
+
+        JSON.stringify(response)
 
         if (response.ok)
         {
@@ -75,36 +77,6 @@ export default function AudioPlayer({ audioItems, validatedCount, nonValidatedCo
         window.location.reload()
       }
     }
-
-    const validate = async (index: number) =>
-      {
-        try
-        {
-          const response = await fetch("/api/validate", {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              index: selectedAudioIndex,
-            })
-          })
-  
-          if (response.ok)
-          {
-            console.log("Succesful")
-            closeDialog()
-            window.location.reload()
-
-          }
-        }
-        catch (error)
-        {
-          console.log(error)
-          closeDialog()
-          window.location.reload()
-        }
-      }
 
   // Adjust textarea height based on content
   const adjustHeight = () => {
@@ -129,11 +101,13 @@ export default function AudioPlayer({ audioItems, validatedCount, nonValidatedCo
 
 
   // Load transcript text when an audio item is selected
-  useEffect(() => {
-    if (selectedAudioIndex !== null) {
-      setTranscriptText(audioItems[selectedAudioIndex - 1].text);
+  useEffect(() => 
+  {
+    if (selectedAudioId !== null) 
+    {
+      setTranscriptText(audioItems.find(audio => audio.id === selectedAudioId)?.text ?? "");
     }
-  }, [selectedAudioIndex, audioItems]);
+  }, [selectedAudioId, audioItems]);
 
   
     
@@ -146,28 +120,28 @@ export default function AudioPlayer({ audioItems, validatedCount, nonValidatedCo
       </div>
       <div className="flex flex-row flex-wrap w-full mt-10">
         {audioItems.map((audioItem) => (
-          <Card key={audioItem.index} className="w-[calc(25%-2rem)] ml-4 mt-4 mr-4 mb-4">
+          <Card key={audioItem.id} className="w-[calc(25%-2rem)] ml-4 mt-4 mr-4 mb-4">
             <CardHeader className="flex justify-center items-center">
-              <CardTitle>{audioItem.index}</CardTitle>
+              <CardTitle>{audioItem.id}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Duration: {audioItem.duration?.toFixed(2)} seconds</p>
+              <p>Duration: {audioItem.duration} seconds</p>
             </CardContent>
             <CardFooter className="flex w-full items-center justify-center">
-              <Button onClick={() => openDialog(audioItem.index)}>Open</Button>
+              <Button onClick={() => openDialog(audioItem.id)}>Open</Button>
             </CardFooter>
           </Card>
         ))}
       </div>
 
-      {selectedAudioIndex !== null && (
+      {selectedAudioId !== null && (
         <Dialog open={true} onOpenChange={closeDialog}>
           <DialogContent className="flex flex-col">
             <DialogHeader className="flex items-center justify-between">
-              <DialogTitle>Audio Details for Audio {selectedAudioIndex}</DialogTitle>
+              <DialogTitle>Audio Details for Audio {selectedAudioId}</DialogTitle>
             </DialogHeader>
             <audio controls>
-              <source src={`/noella/Noella/${audioItems[selectedAudioIndex - 1].mp3_file}`} type="audio/mpeg" />
+              <source src={`/noella/Noella/${audioItems.find(audio => audio.id === selectedAudioId)?.mp3_file}`} type="audio/mpeg" />
             </audio>
             <div>
               <p>Transcript</p>
@@ -181,7 +155,7 @@ export default function AudioPlayer({ audioItems, validatedCount, nonValidatedCo
               />
             </div>
             <div className='flex flex-row items-center justify-center'>
-              <Button onClick={() => change_entry(selectedAudioIndex, transcriptText)}>Validate</Button>
+              <Button onClick={() => change_entry(selectedAudioId, transcriptText)}>Validate</Button>
             </div>
           </DialogContent>
         </Dialog>

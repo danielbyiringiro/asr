@@ -1,21 +1,20 @@
-import fs from 'fs';
+import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
-import path from 'path';
+import { $audio } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
-const change_entry = (index_file: number, transcript: string) =>
+async function change_entry(id: number, transcript: string) 
 {
-    const filePath = path.join(process.cwd(), 'public', 'editable.json')
-    const jsonData = fs.readFileSync(filePath, 'utf8')
-    const data = JSON.parse(jsonData)
-    const entry = data[index_file - 1]
-    entry.text = transcript
-    entry.validated = true
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+    await db.update($audio)
+    .set({text: transcript, validated: true})
+    .where(
+        eq($audio.id, id)
+    )
 }
 
 export async function POST(req: Request)
 {
-    const {index, transcript} = await req.json();
-    change_entry(index, transcript)
+    const {id, transcript} = await req.json();
+    await change_entry(id, transcript);
     return NextResponse.json({success: true}, { status: 200 });
 }
