@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "yarn install"
+    "postinstall": "bun install"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.3",
@@ -25,8 +25,8 @@
     "lucide-react": "^0.455.0",
     "music-metadata": "10.3.1",
     "next": "15.0.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^18",
+    "react-dom": "^18",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7"
   },
