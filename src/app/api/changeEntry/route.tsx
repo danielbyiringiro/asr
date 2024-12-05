@@ -16,5 +16,8 @@ export async function POST(req: Request)
 {
     const {id, transcript} = await req.json();
     await change_entry(id, transcript);
-    return NextResponse.json({success: true}, { status: 200 });
+    const response = NextResponse.json({ success: true }, { status: 200 });
+    response.headers.set('Cache-Control', 'no-store');
+    
+    return response;
 }
