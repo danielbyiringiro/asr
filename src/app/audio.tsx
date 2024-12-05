@@ -32,6 +32,7 @@ interface AudioPlayerProps {
 export default function AudioPlayer({ audioItems, validatedCount, nonValidatedCount }: AudioPlayerProps) {
   const [selectedAudioId, setSelectedAudioId] = useState<number | null>(null);
   const [transcriptText, setTranscriptText] = useState("");
+  const [audioData, setAudioData] = useState(audioItems);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
 

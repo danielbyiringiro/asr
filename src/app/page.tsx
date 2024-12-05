@@ -2,7 +2,7 @@ import AudioPlayer from './audio';
 import { db } from '@/lib/db';
 import { $audio } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
-import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic'
 
 export default async function Page() 
 {
@@ -13,12 +13,11 @@ export default async function Page()
   let nonValidatedCount = audio.length;
   let validatedCount = 106 - nonValidatedCount;
 
-  // Set Cache-Control headers to prevent caching
   return (
     <>
       <AudioPlayer audioItems={audio} validatedCount={validatedCount} nonValidatedCount={nonValidatedCount}/>
       <script dangerouslySetInnerHTML={{ __html: `
-        fetch(window.location.href, { cache: 'no-store' });
+        fetch(window.location.href, { cache: 'no-store', s-maxage: 0 });
       `}} />
     </>
   );
